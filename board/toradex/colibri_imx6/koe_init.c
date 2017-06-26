@@ -25,14 +25,14 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 iomux_v3_cfg_t const bb_spi_9b_pads[] = {
-	MX6_PAD_GPIO_7__GPIO1_IO07 | MUX_PAD_CTRL(NO_PAD_CTRL),		/* CS   - soDimm 55 */
-	MX6_PAD_GPIO_8__GPIO1_IO08 | MUX_PAD_CTRL(NO_PAD_CTRL),		/* SCK  - soDimm 63 */
-	MX6_PAD_SD2_CMD__GPIO1_IO11 | MUX_PAD_CTRL(NO_PAD_CTRL),	/* MOSI - soDimm 69 */
-	MX6_PAD_EIM_D18__GPIO3_IO18 | MUX_PAD_CTRL(NO_PAD_CTRL),	/* MISO - soDimm 77 */
-#	define PIN_CS	IMX_GPIO_NR(1, 7)
-#	define PIN_SCK	IMX_GPIO_NR(1, 8)
-#	define PIN_MOSI	IMX_GPIO_NR(1, 11)
-#	define PIN_MISO	IMX_GPIO_NR(3, 18)
+	MX6_PAD_EIM_DA0__GPIO3_IO00 | MUX_PAD_CTRL(NO_PAD_CTRL),	/* CS   - soDimm 111 */
+	MX6_PAD_EIM_DA9__GPIO3_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL),	/* SCK  - soDimm 112 */
+	MX6_PAD_EIM_DA1__GPIO3_IO01 | MUX_PAD_CTRL(NO_PAD_CTRL),	/* MOSI - soDimm 113 */
+	MX6_PAD_EIM_DA10__GPIO3_IO10| MUX_PAD_CTRL(NO_PAD_CTRL),	/* MISO - soDimm 114 */
+#	define PIN_CS	IMX_GPIO_NR(3, 0)
+#	define PIN_SCK	IMX_GPIO_NR(3, 9)
+#	define PIN_MOSI	IMX_GPIO_NR(3, 1)
+#	define PIN_MISO	IMX_GPIO_NR(3, 10)
 };
 
 static void spi_bitbang_init(void)
@@ -127,6 +127,6 @@ int do_koe_display_init(cmd_tbl_t *cmdtp, int flag, int argc,
 
 U_BOOT_CMD(
 	koe_display_init, 2, 0, do_koe_display_init,
-	"Init KOE display connected to 55,63,69,77 SoDimm pins.",
+	"Init KOE display connected to 111(CS),112(SCK),113(MOSI),114(MISO) SoDimm pins.",
 	"<mode>\nWhere mode: on,off,refresh\n"
 );

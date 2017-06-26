@@ -426,6 +426,9 @@ static iomux_v3_cfg_t const backlight_pads[] = {
 	MX6_PAD_EIM_A22__GPIO2_IO16  | MUX_PAD_CTRL(NO_PULLUP),
 	MX6_PAD_SD4_DAT1__GPIO2_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL),
 #define RGB_BACKLIGHTPWM_GP IMX_GPIO_NR(2, 9)
+	/* pwm balckligt - ravion MCP */
+#define RGB_BACKLIGHTPWM_MCP IMX_GPIO_NR(1, 9)
+	MX6_PAD_GPIO_9__GPIO1_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL),
 };
 
 static iomux_v3_cfg_t const rgb_pads[] = {
@@ -451,6 +454,13 @@ static iomux_v3_cfg_t const rgb_pads[] = {
 		MX6_PAD_DISP0_DAT15__IPU1_DISP0_DATA15 | MUX_PAD_CTRL(OUTPUT_RGB),
 		MX6_PAD_DISP0_DAT16__IPU1_DISP0_DATA16 | MUX_PAD_CTRL(OUTPUT_RGB),
 		MX6_PAD_DISP0_DAT17__IPU1_DISP0_DATA17 | MUX_PAD_CTRL(OUTPUT_RGB),
+		/* 24 bit video */
+		MX6_PAD_DISP0_DAT18__IPU1_DISP0_DATA18 | MUX_PAD_CTRL(OUTPUT_RGB),
+		MX6_PAD_DISP0_DAT19__IPU1_DISP0_DATA19 | MUX_PAD_CTRL(OUTPUT_RGB),
+		MX6_PAD_DISP0_DAT20__IPU1_DISP0_DATA20 | MUX_PAD_CTRL(OUTPUT_RGB),
+		MX6_PAD_DISP0_DAT21__IPU1_DISP0_DATA21 | MUX_PAD_CTRL(OUTPUT_RGB),
+		MX6_PAD_DISP0_DAT22__IPU1_DISP0_DATA22 | MUX_PAD_CTRL(OUTPUT_RGB),
+		MX6_PAD_DISP0_DAT23__IPU1_DISP0_DATA23 | MUX_PAD_CTRL(OUTPUT_RGB),
 };
 
 static void do_enable_hdmi(struct display_info_t const *dev)
@@ -465,7 +475,16 @@ static void enable_rgb(struct display_info_t const *dev)
 		ARRAY_SIZE(rgb_pads));
 	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
 	gpio_direction_output(RGB_BACKLIGHTPWM_GP, 0);
+	gpio_direction_output(RGB_BACKLIGHTPWM_MCP, 1); /* on MCP vit 7 inch Mitsubishi */
 }
+
+/* ToDo: getenv("disply",&disp) and alisise */
+
+enum {
+    DISPLAY_HDMI = 0,
+    DISPALY_LVDS_7_MITS_800x480 = 1,
+    DISPLAY_TFT_35_KOE_240x320 = 2,
+};
 
 static int detect_default(struct display_info_t const *dev)
 {
@@ -496,8 +515,28 @@ struct display_info_t const displays[] = {{
 } }, {
 	.bus	= -1,
 	.addr	= 0,
+	.pixfmt	= IPU_PIX_FMT_RGB24,
+/*	.detect	= detect_default, */
+	.enable	= enable_rgb,
+	.mode	= {
+		.name           = "Mitsubish-800x480",
+		.refresh        = 60,
+		.xres           = 800,
+		.yres           = 480,
+		.pixclock       = 30770,
+		.left_margin    = 30,
+		.right_margin   = 87,
+		.upper_margin   = 13,
+		.lower_margin   = 30,
+		.hsync_len      = 1,
+		.vsync_len      = 1,
+		.sync           = FB_SYNC_EXT,
+		.vmode          = FB_VMODE_NONINTERLACED
+} }, {
+	.bus	= -1,
+	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB666,
-	.detect	= detect_default,
+/*	.detect	= detect_default, */
 	.enable	= enable_rgb,
 	.mode	= {
 		.name           = "vga-rgb",
@@ -511,6 +550,26 @@ struct display_info_t const displays[] = {{
 		.lower_margin   = 11,
 		.hsync_len      = 96,
 		.vsync_len      = 2,
+		.sync           = 0,
+		.vmode          = FB_VMODE_NONINTERLACED
+} }, {
+	.bus	= -1,
+	.addr	= 0,
+	.pixfmt	= IPU_PIX_FMT_RGB24,
+	.detect	= detect_default,
+	.enable	= enable_rgb,
+	.mode	= {
+		.name           = "KOE-240x320",
+		.refresh        = 60,
+		.xres           = 240,
+		.yres           = 320,
+		.pixclock       = 6250,
+		.left_margin    = 48,
+		.right_margin   = 16,
+		.upper_margin   = 6,
+		.lower_margin   = 6,
+		.hsync_len      = 16,
+		.vsync_len      = 6,
 		.sync           = 0,
 		.vmode          = FB_VMODE_NONINTERLACED
 } }, {

@@ -422,10 +422,7 @@ static iomux_v3_cfg_t const backlight_pads[] = {
 	/* Backlight On */
 	MX6_PAD_EIM_D26__GPIO3_IO26 | MUX_PAD_CTRL(NO_PAD_CTRL),
 #define RGB_BACKLIGHT_GP IMX_GPIO_NR(3, 26)
-/* TODO PWM not GPIO */
 	MX6_PAD_EIM_A22__GPIO2_IO16  | MUX_PAD_CTRL(NO_PULLUP),
-	MX6_PAD_SD4_DAT1__GPIO2_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL),
-#define RGB_BACKLIGHTPWM_GP IMX_GPIO_NR(2, 9)
 	/* pwm balckligt - ravion MCP */
 #define RGB_BACKLIGHTPWM_MCP IMX_GPIO_NR(1, 9)
 	MX6_PAD_GPIO_9__GPIO1_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL),
@@ -468,28 +465,42 @@ static void do_enable_hdmi(struct display_info_t const *dev)
 	imx_enable_hdmi_phy();
 }
 
-static void enable_rgb(struct display_info_t const *dev)
+static void enable_rgb_common(struct display_info_t const *dev)
 {
 	imx_iomux_v3_setup_multiple_pads(
 		rgb_pads,
 		ARRAY_SIZE(rgb_pads));
-	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
-	gpio_direction_output(RGB_BACKLIGHTPWM_GP, 0);
-	gpio_direction_output(RGB_BACKLIGHTPWM_MCP, 1); /* on MCP vit 7 inch Mitsubishi */
+	/* backlight unconditionally on for now */
+	imx_iomux_v3_setup_multiple_pads(
+		backlight_pads,
+		ARRAY_SIZE(backlight_pads));
 }
 
-/* ToDo: getenv("disply",&disp) and alisise */
+static void enable_rgb_TX09D200VM0BAA(struct display_info_t const *dev)
+{
+	enable_rgb_common(dev);
+	/* backlight pins (enable and PWM)*/
+	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
+	gpio_direction_output(RGB_BACKLIGHTPWM_MCP, 0);
+}
 
-enum {
-    DISPLAY_HDMI = 0,
-    DISPALY_LVDS_7_MITS_800x480 = 1,
-    DISPLAY_TFT_35_KOE_240x320 = 2,
-};
+static void enable_rgb_vga(struct display_info_t const *dev)
+{
+	enable_rgb_common(dev);
+	/* backlight pins (enable and PWM) */
+	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
+	gpio_direction_output(RGB_BACKLIGHTPWM_MCP, 1);
+}
+
 
 static int detect_default(struct display_info_t const *dev)
 {
-	(void) dev;
-	return 1;
+	char *display = getenv("display");
+
+	if(display) {
+		return (!strcmp(dev->mode.name,display));
+	} else
+		return 0;
 }
 
 struct display_info_t const displays[] = {{
@@ -516,10 +527,10 @@ struct display_info_t const displays[] = {{
 	.bus	= -1,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
-/*	.detect	= detect_default, */
-	.enable	= enable_rgb,
+	.detect	= detect_default,
+	.enable	= enable_rgb_vga,
 	.mode	= {
-		.name           = "Mitsubish-800x480",
+		.name           = "AA070ME11-DA-01",
 		.refresh        = 60,
 		.xres           = 800,
 		.yres           = 480,
@@ -536,10 +547,10 @@ struct display_info_t const displays[] = {{
 	.bus	= -1,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB666,
-/*	.detect	= detect_default, */
-	.enable	= enable_rgb,
+	.detect	= detect_default,
+	.enable	= enable_rgb_vga,
 	.mode	= {
-		.name           = "vga-rgb",
+		.name           = "toradex-640x480",
 		.refresh        = 60,
 		.xres           = 640,
 		.yres           = 480,
@@ -557,26 +568,30 @@ struct display_info_t const displays[] = {{
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
 	.detect	= detect_default,
-	.enable	= enable_rgb,
+	.enable	= enable_rgb_TX09D200VM0BAA,
 	.mode	= {
-		.name           = "KOE-240x320",
+		.name           = "TX09D200VM0BAA",
+		.pixclock       = 33000,
 		.refresh        = 60,
-		.xres           = 240,
-		.yres           = 320,
-		.pixclock       = 6250,
-		.left_margin    = 48,
-		.right_margin   = 16,
-		.upper_margin   = 6,
-		.lower_margin   = 6,
+
 		.hsync_len      = 16,
+		.left_margin    = 74,
+		.xres           = 240,
+		.right_margin   = 16,
+
 		.vsync_len      = 6,
+		.upper_margin   = 6,
+		.yres           = 320,
+		.lower_margin   = 6,
+
 		.sync           = 0,
 		.vmode          = FB_VMODE_NONINTERLACED
 } }, {
 	.bus	= -1,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB666,
-	.enable	= enable_rgb,
+	.detect	= detect_default,
+	.enable	= enable_rgb_vga,
 	.mode	= {
 		.name           = "wvga-rgb",
 		.refresh        = 60,
@@ -643,12 +658,6 @@ static void setup_display(void)
 	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET);
 	writel(reg, &iomux->gpr[3]);
 
-	/* backlight unconditionally on for now */
-	imx_iomux_v3_setup_multiple_pads(backlight_pads,
-					 ARRAY_SIZE(backlight_pads));
-	/* use 0 for EDT 7", use 1 for LG fullHD panel */
-	gpio_direction_output(RGB_BACKLIGHTPWM_GP, 0);
-	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
 }
 #endif /* defined(CONFIG_VIDEO_IPUV3) */
 

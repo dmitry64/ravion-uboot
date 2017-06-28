@@ -96,6 +96,10 @@ int do_koe_display_init(cmd_tbl_t *cmdtp, int flag, int argc,
 	};
 
 	spi_bitbang_init();
+	spi_cmd(0x10, 0x00, false);		/* SLPIN */
+	mdelay(250);
+	spi_cmd(0x01, 0x00, false);		/* SWRESET */
+	spi_cmd(0x00, 0x00, false);		/* NOP */
 
 	if(!strcmp(argv[1],"on")) {
 		printf("Turn on koe display\n");

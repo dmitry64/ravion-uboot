@@ -372,7 +372,7 @@ void ravion_init(void)
 		MX51_PAD_DI1_PIN12__GPIO3_1,	/* GPIO3_1, 26M_OSC_EN (output - 1) */
 		MX51_PAD_EIM_A18__GPIO2_12,	/* GPIO2_12, GP00 (OUTPUT - 0) */
 		MX51_PAD_EIM_A19__GPIO2_13,	/* GPIO2_13, GP01 (OUTPUT - 0) */
-		MX51_PAD_EIM_A23__GPIO2_17,	/* GPIO2_17, GP02 (OUTPUT - 0) */
+		MX51_PAD_EIM_A23__GPIO2_17,	/* GPIO2_17, GP02 (OUTPUT - 1) */
 		MX51_PAD_EIM_D17__GPIO2_1,	/* GPIO2_1,  GP03 (OUTPUT - 0) */
 		MX51_PAD_EIM_D18__GPIO2_2,	/* GPIO2_2,  GPI0 (INPUT) */
 		MX51_PAD_EIM_D20__GPIO2_4,	/* GPIO2_4,  GPI1 (INPUT) */
@@ -392,7 +392,7 @@ void ravion_init(void)
 	gpio_direction_output(IMX_GPIO_NR(3, 1), 1);
 	gpio_direction_output(IMX_GPIO_NR(2, 12), 0);
 	gpio_direction_output(IMX_GPIO_NR(2, 13), 0);
-	gpio_direction_output(IMX_GPIO_NR(2, 17), 0);
+	gpio_direction_output(IMX_GPIO_NR(2, 17), 1);
 	gpio_direction_output(IMX_GPIO_NR(2, 1), 0);
 	gpio_direction_input(IMX_GPIO_NR(2, 2));
 	gpio_direction_input(IMX_GPIO_NR(2, 4));

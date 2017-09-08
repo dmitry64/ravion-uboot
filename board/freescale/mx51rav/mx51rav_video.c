@@ -121,7 +121,7 @@ int board_video_skip(void)
 	}
 	
 	ret = ipuv3_fb_init(&dvi, 0, IPU_PIX_FMT_RGB24);*/
-	ret = ipuv3_fb_init(&my_vga, 0, IPU_PIX_FMT_RGB565);
+	ret = ipuv3_fb_init(&my_vga, 0, IPU_PIX_FMT_LVDS666);
 	if (ret)
 		printf("MY VGA cannot be configured: %d\n", ret);
 	return ret;

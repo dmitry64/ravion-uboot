@@ -64,6 +64,22 @@ static struct fb_videomode const dvi = {
 	.vmode		= FB_VMODE_NONINTERLACED
 };
 
+static struct fb_videomode const my_vga = {
+	.name		= "MY-VGA",
+	.refresh	= 57,
+	.xres		= 640,
+	.yres		= 480,
+	.pixclock	= 40000,
+	.left_margin	= 144,
+	.right_margin	= 16,
+	.upper_margin	= 33,
+	.lower_margin	= 12,
+	.hsync_len	= 96,
+	.vsync_len	= 2,
+	.sync		= 0,
+	.vmode		= FB_VMODE_NONINTERLACED
+};
+
 void setup_iomux_lcd(void)
 {
 	/* DI2_PIN15 */
@@ -92,6 +108,7 @@ void setup_iomux_lcd(void)
 int board_video_skip(void)
 {
 	int ret;
+	/*
 	char const *e = getenv("panel");
 
 	if (e) {
@@ -102,13 +119,10 @@ int board_video_skip(void)
 			return ret;
 		}
 	}
-
-	/*
-	 * 'panel' env variable not found or has different value than 'claa'
-	 *  Defaulting to dvi output.
-	 */
-	ret = ipuv3_fb_init(&dvi, 0, IPU_PIX_FMT_RGB24);
+	
+	ret = ipuv3_fb_init(&dvi, 0, IPU_PIX_FMT_RGB24);*/
+	ret = ipuv3_fb_init(&my_vga, 0, IPU_PIX_FMT_RGB565);
 	if (ret)
-		printf("dvi cannot be configured: %d\n", ret);
+		printf("MY VGA cannot be configured: %d\n", ret);
 	return ret;
 }

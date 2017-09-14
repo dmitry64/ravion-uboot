@@ -205,12 +205,7 @@
 #define CONFIG_CMD_DATE
 
 #define	CONFIG_TIMESTAMP
-#define	CONFIG_BOOTDELAY		5	/* autoboot delay */
-#define CONFIG_AUTOBOOT_KEYED		1
-#define CONFIG_AUTOBOOT_PROMPT  \
-        "Enter boot password in %d seconds to stop autoboot process\n", bootdelay
-#undef CONFIG_AUTOBOOT_DELAY_STR
-#define CONFIG_AUTOBOOT_STOP_STR "ravion"
+#define	CONFIG_BOOTDELAY		1	/* autoboot delay */
 
 #define	CONFIG_ETHPRIME		"FEC0"
 #define	CONFIG_ETHADDR		00:11:22:33:44:55
@@ -228,7 +223,7 @@
 	"NFS_PATH=/cimc/exportfs/imx515-ravion\0" \
 	"mtdids="MTDIDS_DEFAULT"\0" \
 	"mtdparts="MTDPARTS_DEFAULT"\0" \
-	"script_name=boot/bscript.img \0" \
+	"script_name=bscript.img \0" \
 	"script_addr=0x98760000 \0" \
 	"blockboot=" \
 	"if fatload ${bdev} ${binst}:${bpart} ${script_addr} ${script_name}; then " \

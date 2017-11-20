@@ -366,6 +366,28 @@ int board_init(void)
  */
 void ravion_init(void)
 {
+	udelay(100);
+	
+	// I2C pot default value
+	
+	printf("I2C Setting bus number");
+	if(i2c_set_bus_num(0)) {
+		printf("I2C Error! Unable to set bus number");
+	}
+	
+	printf("I2C Probing");
+	if (i2c_probe(0x2c)) {
+		printf("I2C Device not found!");
+	}
+	
+	unsigned char brightness = 0x00;
+	printf("I2C Writing brightness");
+	if(i2c_write(0x2c,0x00,1,&brightness,1)) {
+		printf("I2C Error! Unable write");
+	}
+	
+	udelay(100);
+	
 	static const iomux_v3_cfg_t ravion_pads[] = {
 		MX51_PAD_CSI2_PIXCLK__GPIO4_15,	/* GPIO4_15, +3.3En (output - 1) */
 		MX51_PAD_GPIO1_1__GPIO1_1,	/* GPIO1_1, EN_SW12V (output - 0) */
